@@ -1,68 +1,24 @@
-version: '3.4'
+version: '3.5'
 services:
-
-  #PHP Service
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: digitalocean.com/php
-    container_name: laravelapp-app
-    restart: unless-stopped
-    tty: true
-    environment:
-      SERVICE_NAME: app
-      SERVICE_TAGS: dev
-    working_dir: /var/www
-    volumes:
-      - ./:/var/www
-      - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
-    networks:
-      - app-network
-
-  #Nginx Service
-  webserver:
-    image: nginx:alpine
-    container_name: laravelapp-webserver
-    restart: unless-stopped
-    tty: true
+  php:
+    image: us.icr.io/recyminer/store-recyminer:latest
+    restart: always
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./:/var/www
-      - ./nginx/conf.d/:/etc/nginx/conf.d/
-    networks:
-      - app-network
-
-  #MySQL Service
-  db:
+      - 8000:80
+    environment:
+      - APP_KEY="base64:kOTr+LW2oGYaLm77E20PSas/4Ns7+p53fKOtTng9foI="
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_PORT=3306
+      - DB_HOST=mysql
+      - DB_DATABASE
+      - DB_USERNAME
+      - DB_PASSWORD
+  mysql:
     image: mysql:5.7
-    container_name: laravelapp-db
-    restart: unless-stopped
-    tty: true
-    ports:
-      - "3306:3306"
+    restart: always
     environment:
-      MYSQL_USER: admin
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_ROOT_HOST: '%'  # needs to be enclosed with quotes
-      MYSQL_DATABASE: 6valy_db
-      SERVICE_TAGS: dev
-      SERVICE_NAME: mysql
-    volumes:
-      - ./mysql/my.cnf:/etc/mysql/my.cnf
-      # - ./installation:/docker-entrypoint-initdb.d
-      - dbdata:/var/lib/mysql/
-    #network_mode: "host"
-    networks:
-      - app-network
-
-#Docker Networks
-networks:
-  app-network:
-    driver: bridge
-#Volumes
-volumes:
-  dbdata:
-    driver: local
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}

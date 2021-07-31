@@ -1,0 +1,23 @@
+php:
+  repository: "us.icr.io/recyminer/store-recyminer:latest"
+  tag: "latest"
+  fpmEnabled: false
+  envVars:
+    - name: APP_ENV
+      value: production
+    - name: APP_DEBUG
+      value: false
+    - name: DB_PORT
+      value: 3306
+    - name: DB_HOST
+      value: localhost
+#Use Ingress Controller
+service:
+  type: ClusterIP
+  HTTPPort: 80
+ingress:
+  enabled: true
+  domain: store.recyminer.com
+
+
+

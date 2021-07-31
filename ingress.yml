@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: store-recyminer-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+    - hosts:
+        - store.recyminer.com
+      secretName: store-recyminer-tls
+  rules:
+    - host: store.recyminer.com
+      http:
+        paths:
+          - backend:
+              serviceName: store-recyminer
+              servicePort: 80
