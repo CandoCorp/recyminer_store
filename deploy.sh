@@ -22,19 +22,26 @@ echo -e "CHECKING HELM releases in this namespace: ${CLUSTER_NAMESPACE}"
 helm list ${HELM_TLS_OPTION} --namespace ${CLUSTER_NAMESPACE}
 
 helm repo add stable https://charts.helm.sh/stable --force-update
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx --force-update
+
+echo "SECRETS=${SECRETS}"
+echo $WORKING_DIR
+cd $WORKING_DIR
+touch ./helm/secrets.yml
+printf "%s" "$SECRETS" > "./helm/secrets.yml"
+cat ./helm/secrets.yml
 
 helm repo update
-helm install store-recyminer -f helm/values.yml -f helm/secrets.yml stable/lamp
-helm install nginx-ingress stable/nginx-ingress --set controller.publishService.enabled=true
+helm install store-recyminer -f ./helm/values.yml -f ./helm/secrets.yml stable/lamp  --namespace stagging-store-recyminer
+helm install nginx-ingress stable/nginx-ingress --set controller.publishService.enabled=true --namespace stagging-store-recyminer
 
-kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.15.0/cert-manager.crds.yaml
+kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.15.0/cert-manager.crds.yaml --namespace stagging-store-recyminer
 kubectl delete namespace cert-manager
 kubectl create namespace cert-manager
 helm repo add jetstack https://charts.jetstack.io
 helm install cert-manager --version v0.15.0 --namespace cert-manager jetstack/cert-manager
 
-kubectl create -f ingress.yml
-kubectl create -f staging_issuer.yml
+kubectl create -f ./ingress.yml
+kubectl create -f ./staging_issuer.yml
 
 kubectl get service nginx-ingress-controller
