@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y \
     libmcrypt-dev \
     libreadline-dev \
     libfreetype6-dev \
+    php7.4-zip\
     g++
 
 # Apache configuration
