@@ -1,5 +1,5 @@
 php:
-  repository: "us.icr.io/recyminer/store-recyminer:latest"
+  repository: "us.icr.io/recyminer/store-recyminer"
   tag: "latest"
   fpmEnabled: false
   envVars:
