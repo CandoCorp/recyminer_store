@@ -2,20 +2,36 @@ FROM php:7.4-apache
 
 # Install packages
 RUN apt-get update && apt-get install -y \
-    git \
-    zip \
-    curl \
-    sudo \
-    unzip \
-    libicu-dev \
-    libbz2-dev \
+    build-essential \
     libpng-dev \
-    libjpeg-dev \
-    libmcrypt-dev \
-    libreadline-dev \
+    libjpeg62-turbo-dev \
     libfreetype6-dev \
-    php7.4-zip\
-    g++
+    libonig-dev \
+    libxml2-dev \
+    locales \
+    zip \
+    libzip-dev \
+    jpegoptim optipng pngquant gifsicle \
+    vim \
+    unzip \
+    git \
+    curl
+
+# Install extensions
+RUN docker-php-ext-install mysqli pdo pdo_mysql mbstring exif pcntl bcmath gd zip && docker-php-ext-enable pdo_mysql zip
+RUN docker-php-source delete
+
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+#RUN apt-get update
+#RUN apt -y install software-properties-common
+#
+#RUN apt -y install php7.4 php7.4-cli php7.4-fpm php7.4-json php7.4-common php7.4-mysql php7.4-zip php7.4-gd php7.4-mbstring php7.4-curl php7.4-xml php7.4-pear php7.4-bcmath
+
+#RUN apt-get install libz-dev -y
+#RUN pecl install zlib zip
+#RUN /etc/init.d/apache2 restart
 
 # Apache configuration
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
