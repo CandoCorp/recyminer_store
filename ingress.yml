@@ -15,7 +15,9 @@ spec:
       http:
         paths:
           - path: /
-          - pathType: Prefix
-          - backend:
-              serviceName: store-recyminer
-              servicePort: 80
+            pathType: Prefix
+            backend:
+              service:
+                name: store-recyminer
+                port:
+                  number: 80
