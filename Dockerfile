@@ -1,4 +1,4 @@
-FROM php:7.4-apache
+FROM php:7.4-fpm
 
 # Install packages
 RUN apt-get update && apt-get install -y \
@@ -24,20 +24,11 @@ RUN docker-php-source delete
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-#RUN apt-get update
-#RUN apt -y install software-properties-common
-#
-#RUN apt -y install php7.4 php7.4-cli php7.4-fpm php7.4-json php7.4-common php7.4-mysql php7.4-zip php7.4-gd php7.4-mbstring php7.4-curl php7.4-xml php7.4-pear php7.4-bcmath
-
-#RUN apt-get install libz-dev -y
-#RUN pecl install zlib zip
-#RUN /etc/init.d/apache2 restart
-
 # Apache configuration
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-RUN a2enmod rewrite headers
+#ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+#RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+#RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+#RUN a2enmod rewrite headers
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -53,9 +44,14 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY . /var/www/tmp
 RUN cd /var/www/tmp && composer install --no-dev
 
+# Add user for laravel application
+RUN groupadd -g 1000 www
+RUN useradd -u 1000 -ms /bin/bash -g www www
+
 # Ensure the entrypoint file can be run
 RUN chmod +x /var/www/tmp/docker-entrypoint.sh
 ENTRYPOINT ["/var/www/tmp/docker-entrypoint.sh"]
 
 # The default apache run command
-CMD ["apache2-foreground"]
+EXPOSE 8000
+CMD ["php-fpm"]
